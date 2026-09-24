@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Say Something. Tiny games for getting better at talking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  --bg:#F5F4FB; --panel:#FFFFFF; --ink:#1C1B33; --muted:#5E5C7A; --line:#1C1B33;
+  --mint:#BDECD2; --butter:#FFE28C; --pink:#FFBFCF; --lav:#D3C8FF;
+  --on:#1C1B33; --hot:#E5484D;
+  --display:'Bricolage Grotesque',ui-rounded,'Trebuchet MS',system-ui,sans-serif;
+  --body:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15142A; --panel:#211F3F; --ink:#F0EEFF; --muted:#A9A6CC; --line:#F0EEFF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15142A; --panel:#211F3F; --ink:#F0EEFF; --muted:#A9A6CC; --line:#F0EEFF;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.55 var(--body);-webkit-font-smoothing:antialiased;min-height:100vh}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px;border-radius:8px}
+
+.c-mint{--tone:var(--mint)} .c-butter{--tone:var(--butter)} .c-pink{--tone:var(--pink)} .c-lav{--tone:var(--lav)}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;max-width:1120px;margin:0 auto;padding:1rem clamp(1rem,4vw,2rem)}
+.logo{display:flex;align-items:center;gap:.55rem;font:800 1.3rem var(--display);letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.top-right{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.25rem 1rem;align-items:center;font-size:.92rem;color:var(--muted)}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:.25rem}
+.linkbtn:hover{color:var(--ink)}
+main{max-width:1120px;margin:0 auto;padding:0 clamp(1rem,4vw,2rem) 4rem}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(2rem,5vw,4rem);align-items:center;padding:clamp(1rem,4vw,3rem) 0 1.5rem}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+h1{font:800 clamp(3.6rem,12vw,8rem)/.86 var(--display);letter-spacing:-.045em;margin:0}
+.lede{font-size:1.2rem;max-width:32ch;color:var(--muted);margin:1.4rem 0 0}
+.hero .bubble{margin-bottom:26px}
+.hero .bubble .prompt{margin-bottom:1.25rem}
+.hb-actions{display:flex;flex-wrap:wrap;gap:.6rem;--tone:var(--butter)}
+
+/* bubbles */
+.bubble{position:relative;background:var(--tone);color:var(--on);border:2px solid var(--line);border-radius:28px;padding:clamp(1.25rem,4vw,2.25rem);filter:drop-shadow(5px 5px 0 var(--line));margin-bottom:24px}
+.bubble::after{content:"";position:absolute;left:38px;bottom:-12px;width:22px;height:22px;background:var(--tone);border-right:2px solid var(--line);border-bottom:2px solid var(--line);border-bottom-right-radius:5px;transform:rotate(45deg)}
+.prompt{font:700 clamp(1.4rem,4.2vw,2.15rem)/1.18 var(--display);letter-spacing:-.015em;margin:0}
+.sub{margin:0 0 .6rem;font-weight:600;opacity:.8}
+.stance{display:inline-block;font:700 .95rem var(--body);padding:.25rem .85rem;border:2px solid var(--on);border-radius:999px;margin-bottom:.9rem;background:rgba(255,255,255,.55)}
+.pair{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;font:800 clamp(1.8rem,6vw,3rem)/1 var(--display);letter-spacing:-.02em;margin-bottom:.9rem}
+.pair b{font-size:.7em;opacity:.6}
+.items{display:flex;flex-wrap:wrap;gap:.6rem;margin:0 0 1rem;padding:0;list-style:none}
+.item{background:rgba(255,255,255,.6);border:2px solid var(--on);border-radius:16px;padding:.5rem .95rem;font:700 1.15rem var(--display)}
+.bigword{font-size:clamp(2.6rem,9vw,4.4rem);letter-spacing:-.03em;line-height:1}
+.pos{font-size:.9rem;font-style:italic;opacity:.75}
+.def{margin:.5rem 0 1.1rem;font-size:1.1rem}
+.swap{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media (max-width:560px){.swap{grid-template-columns:1fr}}
+.swap>div{background:rgba(255,255,255,.55);border:2px solid var(--on);border-radius:16px;padding:.7rem .9rem}
+.swap .try{background:rgba(255,255,255,.92)}
+.swap p{margin:.2rem 0 0;font-weight:600}
+.lbl{font-size:.85rem;font-weight:600;opacity:.7}
+.challenge{margin:1.1rem 0 0;font-weight:700;font-size:1.1rem}
+.example{margin:.9rem 0 0;font-size:1.05rem}
+
+/* buttons + chips */
+.btn{font:700 1rem var(--body);padding:.8rem 1.5rem;background:var(--tone,var(--lav));color:var(--on);border:2px solid var(--line);border-radius:999px;cursor:pointer;box-shadow:3px 3px 0 var(--line);transition:transform .1s,box-shadow .1s}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--line)}
+.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--line)}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:none}
+.btn.ghost:hover{background:var(--panel);transform:none}
+.bubble .btn.ghost{color:var(--on);border-color:var(--on)}
+.bubble .btn.ghost:hover{background:rgba(255,255,255,.5)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.chip{font:600 .92rem var(--body);padding:.4rem .9rem;border:2px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);cursor:pointer}
+.chip:hover{background:var(--panel)}
+.chip[aria-pressed="true"]{background:var(--tone);color:var(--on)}
+
+/* daily */
+.daily{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;background:var(--panel);border:2px solid var(--line);border-radius:22px;text-decoration:none;color:var(--ink);margin:1.25rem 0 0}
+.daily .ico{flex:none;display:grid;place-items:center;width:3.4rem;height:3.4rem;font-size:1.7rem;background:var(--tone);border:2px solid var(--line);border-radius:16px}
+.daily .txt{flex:1;min-width:0}
+.daily strong{display:block;font:700 1.15rem var(--display)}
+.daily span.q{display:block;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.daily:hover{background:var(--tone)}
+.daily:hover span.q{color:var(--on)}
+.daily:hover .btn{background:var(--panel)}
+.daily:hover strong{color:var(--on)}
+@media (max-width:560px){.daily .btn{display:none}}
+
+/* groups + cards */
+.group{margin-top:3rem}
+.ghead{display:flex;align-items:baseline;flex-wrap:wrap;gap:.25rem 1rem;margin-bottom:1.4rem}
+.ghead h2{display:flex;align-items:center;gap:.6rem;font:700 1.7rem var(--display);letter-spacing:-.02em;margin:0}
+.dot{width:.95rem;height:.95rem;border-radius:50%;background:var(--tone);border:2px solid var(--line)}
+.ghead p{margin:0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:30px 26px}
+.card{position:relative;display:flex;flex-direction:column;gap:.3rem;min-height:150px;padding:1.15rem 1.3rem 1.2rem;background:var(--tone);color:var(--on);text-decoration:none;border:2px solid var(--line);border-radius:22px;filter:drop-shadow(4px 4px 0 var(--line));transition:transform .15s,rotate .15s,filter .15s}
+.card::after{content:"";position:absolute;left:30px;bottom:-9px;width:16px;height:16px;background:var(--tone);border-right:2px solid var(--line);border-bottom:2px solid var(--line);border-bottom-right-radius:4px;transform:rotate(45deg)}
+.card:nth-child(even)::after{left:auto;right:30px}
+.card:nth-child(3n+1){rotate:-.6deg}
+.card:nth-child(3n+2){rotate:.5deg}
+.card:hover{transform:translate(-2px,-3px);rotate:0deg;filter:drop-shadow(6px 6px 0 var(--line))}
+.card .emoji{font-size:2rem;line-height:1;margin-bottom:.5rem}
+.card h3{font:700 1.4rem/1.1 var(--display);letter-spacing:-.02em;margin:0}
+.card p{margin:0;font-size:.98rem;opacity:.85}
+
+/* stage */
+.stage{max-width:760px;margin:0 auto;padding-top:.5rem}
+.back{display:inline-block;color:var(--muted);text-decoration:none;font-weight:600;margin:.5rem 0}
+.back::before{content:"\2190\00a0"}
+.back:hover{color:var(--ink)}
+.stage-title{font:800 clamp(2rem,6vw,3rem)/1 var(--display);letter-spacing:-.03em;margin:.4rem 0 1.4rem}
+.settings{display:grid;gap:.7rem;margin-bottom:1.9rem}
+.setrow{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .9rem}
+.setlabel{min-width:8rem;font-weight:600;color:var(--muted);font-size:.92rem}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.fw{display:flex;flex-wrap:wrap;gap:.5rem;list-style:none;padding:0;margin:0 0 1.1rem;counter-reset:s}
+.fw li{counter-increment:s;background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:.3rem .85rem;font-weight:600;font-size:.92rem}
+.fw li::before{content:counter(s) ". ";opacity:.6}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:.5rem}
+.timer{margin:1.2rem 0 1rem}
+.phase{font-weight:600;color:var(--muted);min-height:1.6em}
+.digits{font:800 clamp(3.6rem,15vw,6.5rem)/1 var(--display);letter-spacing:-.04em;font-variant-numeric:tabular-nums;margin:.1rem 0 .7rem}
+.bar,.meter{height:16px;border:2px solid var(--line);border-radius:999px;background:var(--panel);overflow:hidden}
+.fill,.meter i{display:block;height:100%;width:100%;background:var(--tone)}
+.meter{height:12px;margin:.35rem 0 .9rem}
+.meter i{width:0}
+.meter.sil i{background:var(--hot)}
+.stage.low .fill{background:var(--hot)}
+.stage.low .digits{color:var(--hot)}
+.actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1rem}
+.tip,.note-box{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:.9rem 1.1rem;margin-top:1.1rem}
+.tip p,.note-box p{margin:0}
+.stage.running .settings,.stage.running .idle-only{display:none}
+.linkrow{display:flex;gap:.6rem;margin-top:1rem}
+.field{width:100%;padding:.8rem 1rem;border:2px solid var(--line);border-radius:14px;background:var(--panel);color:var(--ink)}
+textarea.field{min-height:9rem;resize:vertical;line-height:1.5}
+.note{min-height:1.5em;margin:.5rem 0 0;color:var(--muted);font-size:.95rem}
+.chain{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem}
+.pill{display:inline-flex;gap:.4rem;align-items:baseline;background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:.2rem .8rem;font-weight:600}
+.pill small{color:var(--muted);font-weight:500}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.75rem;margin:1rem 0}
+.stat{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:.8rem 1rem}
+.stat b{display:block;font:800 2.2rem/1 var(--display)}
+.stat span{color:var(--muted);font-size:.9rem}
+.transcript{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:1rem 1.1rem;line-height:1.85;margin:1rem 0}
+.live{min-height:5rem;color:var(--muted)}
+mark{background:var(--butter);color:var(--on);padding:0 .2em;border-radius:.3em}
+.privacy{color:var(--muted);font-size:.9rem;margin:1.25rem 0 0;max-width:60ch}
+.foot{margin-top:4rem;color:var(--muted);font-size:.9rem;max-width:62ch}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+
+/* ring timer */
+.ringwrap{position:relative;width:min(290px,72vw);aspect-ratio:1;margin:1rem auto .4rem}
+.ring{width:100%;height:100%;display:block;overflow:visible;filter:drop-shadow(4px 4px 0 var(--line))}
+.ring .base{fill:var(--panel);stroke:var(--line);stroke-width:22}
+.ring .chan{fill:none;stroke:var(--panel);stroke-width:14}
+.ring .prog{fill:none;stroke:var(--tone);stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset .12s linear}
+.stage.low .ring .prog{stroke:var(--hot)}
+.ringtxt{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ringtxt .digits{font-size:clamp(2.8rem,14vw,4.6rem);margin:0}
+.ringlabel{font-weight:600;color:var(--muted);margin-top:.15rem}
+.hint{text-align:center;color:var(--muted);min-height:1.6em;margin:.3rem 0}
+.micline{display:flex;align-items:center;gap:.8rem;max-width:340px;margin:.5rem auto 0}
+.micline .meter{flex:1;margin:0}
+.rec{color:var(--hot);font-weight:700;font-size:.9rem;white-space:nowrap;min-width:5.2rem}
+.timer{margin:.8rem 0 .5rem}
+
+/* spin reel */
+.reel{position:relative;--fs:clamp(1.4rem,4.2vw,2.15rem);--rh:calc(var(--fs)*3.7);height:var(--rh);overflow:hidden}
+.reel.big{--fs:clamp(2.6rem,9vw,4.4rem);--rh:calc(var(--fs)*1.9)}
+.reel::before,.reel::after{content:"";position:absolute;left:0;right:0;height:26%;z-index:1;pointer-events:none}
+.reel::before{top:0;background:linear-gradient(var(--tone),transparent)}
+.reel::after{bottom:0;top:auto;left:0;background:linear-gradient(transparent,var(--tone))}
+.reel .strip{will-change:transform}
+.ritem{height:var(--rh);display:flex;align-items:center}
+.ritem span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font:700 var(--fs)/1.2 var(--display);letter-spacing:-.015em}
+.reel.big .ritem span{font-weight:800;letter-spacing:-.03em;line-height:1}
+.qmark{opacity:.35}
+.bubble.pop .prompt,.bubble.pop .pair,.bubble.pop .items{animation:pop .45s cubic-bezier(.2,1.5,.4,1)}
+@keyframes pop{from{transform:scale(.93);opacity:.3}to{transform:none;opacity:1}}
+.bubble::after{z-index:2}
+.reel::after{z-index:1}
+
+/* report */
+.donehead{font:800 clamp(1.6rem,5vw,2.2rem)/1.1 var(--display);letter-spacing:-.02em;margin:1.5rem 0 .3rem}
+.is-done .settings{display:none}
+.report{margin-top:1.25rem}
+.report h3{font:700 1.5rem var(--display);letter-spacing:-.01em;margin:0 0 .6rem}
+.stat small{display:block;color:var(--muted);font-size:.82rem;margin-top:.15rem}
+.stat b{font-size:2rem;text-transform:none}
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1rem 0}
+@media (max-width:640px){.notes{grid-template-columns:1fr}}
+.notes>div{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:.8rem 1rem}
+.notes h4{display:flex;align-items:center;gap:.5rem;margin:0 0 .4rem;font:700 1.05rem var(--display)}
+.notes h4::before{content:"";width:.75rem;height:.75rem;border-radius:50%;border:2px solid var(--line);background:var(--mint)}
+.notes .f h4::before{background:var(--pink)}
+.notes ul{margin:0;padding-left:1.1rem}
+.notes li{margin:.25rem 0}
+.listen{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin:1rem 0}
+.listen audio{max-width:100%}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="#/" aria-label="Say Something, home">
+    <svg width="30" height="28" viewBox="0 0 30 28" aria-hidden="true"><path d="M5 2h20a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3H15l-7 5v-5H5a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3z" fill="var(--lav)" stroke="var(--line)" stroke-width="2" stroke-linejoin="round"/></svg>
+    say something.
+  </a>
+  <div class="top-right">
+    <span id="stats" role="status"></span>
+    <button class="linkbtn" id="snd" type="button"></button>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pick = (arr, rng = Math.random) => arr[Math.floor(rng() * arr.length)];
+const shuffle = (arr, rng = Math.random) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const fmt = s => { s = Math.max(0, Math.ceil(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const fmtTime = s => s < 60 ? s + ' sec' : (s / 60) + ' min';
+const hashStr = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+const mulberry32 = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const fmtDate = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+
+let cleanups = [];
+const onLeave = fn => cleanups.push(fn);
+const runCleanups = () => { cleanups.splice(0).forEach(f => { try { f(); } catch (e) {} }); };
+
+/* ---------- progress (per browser) ---------- */
+const store = {
+  key: 'saysomething:v1',
+  data: { days: {}, total: 0, sound: true },
+  load() { try { const r = localStorage.getItem(this.key); if (r) Object.assign(this.data, JSON.parse(r)); } catch (e) {} },
+  save() { try { localStorage.setItem(this.key, JSON.stringify(this.data)); } catch (e) {} },
+  today() { return fmtDate(new Date()); },
+  addRound() { const t = this.today(); this.data.days[t] = (this.data.days[t] || 0) + 1; this.data.total++; this.save(); renderStats(); },
+  streak() {
+    let n = 0; const d = new Date();
+    if (!this.data.days[this.today()]) d.setDate(d.getDate() - 1);
+    while (this.data.days[fmtDate(d)]) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+};
+function renderStats() {
+  const t = store.data.days[store.today()] || 0, s = store.streak();
+  $('#stats').textContent = t ? `${t} ${t === 1 ? 'round' : 'rounds'} today${s > 1 ? ', ' + s + '-day streak' : ''}` : 'No rounds yet today';
+  const b = $('#snd'); b.textContent = store.data.sound ? 'Sound on' : 'Sound off';
+  b.setAttribute('aria-pressed', String(store.data.sound));
+}
+
+/* ---------- sound + timer ---------- */
+let actx;
+function beep(freq = 660, dur = 0.14) {
+  if (!store.data.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine'; o.frequency.value = freq; g.gain.value = 0.06;
+    o.connect(g); g.connect(actx.destination); o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + dur);
+    o.stop(actx.currentTime + dur + 0.02);
+  } catch (e) {}
+}
+function countdown(seconds, { onTick, onEnd }) {
+  const t0 = performance.now(), end = t0 + seconds * 1000;
+  let stopped = false, endedAt = 0;
+  const id = setInterval(() => {
+    const left = (end - performance.now()) / 1000;
+    if (left <= 0) { stop(); onTick && onTick(0, seconds); onEnd && onEnd(); return; }
+    onTick && onTick(left, seconds);
+  }, 100);
+  function stop() { if (!stopped) { stopped = true; endedAt = performance.now(); clearInterval(id); } }
+  onTick && onTick(seconds, seconds);
+  return { stop, elapsed: () => Math.min(seconds, ((stopped ? endedAt : performance.now()) - t0) / 1000) };
+}
+
+/* ---------- content ---------- */
+const IMPROMPTU = {
+  "Everyday life": ["What is a small daily habit that changed your life?","Describe your perfect lazy Sunday.","What is something everyone should learn to cook?","Is it better to wake up early or stay up late?","What is the most underrated everyday object?"],
+  "Funny": ["If animals could talk, which one would be the rudest?","Invent a holiday and explain how people celebrate it.","What would your autobiography be called?","Which fictional villain would make the best roommate?","Defend the idea that cereal is a soup."],
+  "Deep": ["What does it mean to live a good life?","Would you want to know the date you will die?","What is something you believed as a kid that turned out to be wrong?","Is it more important to be liked or to be respected?","What do we owe to strangers?"],
+  "Debate": ["Should voting be mandatory?","Is it ever okay to lie?","Should zoos exist?","Are exams a fair way to measure ability?","Should everyone learn a second language in school?"],
+  "Work": ["Should people be allowed to work completely remotely?","Would you take a four-day work week with longer days?","What makes a good manager?","Is passion or discipline more important for a career?","How should teams handle disagreement?"],
+  "College": ["What is one thing college does not teach but should?","Describe your first day at college.","Are group projects worth it?","Should attendance be compulsory?","What is the best advice for a first-year student?"],
+  "Technology": ["Which invention could you not live without?","Will AI make people more creative or less?","Should kids have smartphones?","What is one app you would delete from the world?","Is privacy still possible online?"],
+  "Relationships": ["What makes a friendship last?","How do you apologize well?","Is it better to have a few close friends or many casual ones?","What is the most important quality in a partner?","How do you say no without hurting someone?"],
+  "Society": ["Has social media made people lonelier?","Should cities ban cars from their centers?","What would make public transport better?","Is fame worth it?","What makes a neighborhood feel like home?"]
+};
+const BRAIN = ["Name one invention you could not live without, and why.","What is something you would ban if you could?","What makes someone charismatic?","Describe your morning in three sentences.","What is the best gift you have ever received?","What is a skill you wish you had?","What would you do with a free day and no phone?","What is a food you could eat every day?","Who is someone you admire, and why?","What is the most useful lesson you learned the hard way?","What does your ideal home look like?","What is a tradition you love?","What would you tell your younger self?","Describe your city to someone who has never been.","What is overrated?","What is underrated?","What is the best trip you have taken?","What makes a good teacher?","Which movie should everyone watch, and why?","What small thing makes your day better?","What is a rule you live by?","What would you do if you were invisible for an hour?","What is the hardest part of being your age?","What are you most looking forward to?"];
+const HOT = ["College degrees are overrated.","Everyone should live alone at least once.","Social media has made people lonelier.","Working from home makes people less productive.","Breakfast is the most overrated meal.","Handwriting should still be taught in schools.","Group chats are worse than email.","Talent matters more than hard work.","Cities are better than villages.","The book is always better than the movie.","Tipping culture has gone too far.","Homework should be abolished.","Everyone should learn to code.","Phones should be banned in classrooms.","Being early is better than being on time.","Success is mostly luck.","Pineapple belongs on pizza.","Silence is underrated in conversation.","Nostalgia makes us worse at judging the present.","Open-plan offices should disappear.","Specialists beat generalists."];
+const PAIRS = [["Banana","Lawyer"],["Umbrella","Guitar"],["Elevator","Grandmother"],["Cactus","Interview"],["Pizza","Astronaut"],["Mirror","Monday"],["Bicycle","Secret"],["Clock","Ocean"],["Passport","Sandwich"],["Traffic","Poetry"],["Coffee","Detective"],["Library","Thunder"],["Balloon","Deadline"],["Cricket","Diplomat"],["Suitcase","Silence"],["Lighthouse","Startup"],["Spoon","Democracy"],["Notebook","Volcano"],["Wi-Fi","Monsoon"],["Shoes","Time travel"]];
+const OBJECTS = [["Airport","✈️"],["Broken watch","⌚"],["Stranger","👤"],["Umbrella","☂️"],["Last train","🚆"],["Old letter","✉️"],["Locked door","🚪"],["Lost dog","🐕"],["Birthday cake","🎂"],["Power cut","🔌"],["Borrowed bicycle","🚲"],["Phone call","📞"],["Tea stall","🍵"],["Empty classroom","🏫"],["Missing key","🔑"],["Rooftop","🏙️"],["Wedding invitation","💌"],["Cracked mirror","🪞"],["Night bus","🚌"],["Suitcase","🧳"],["Old photograph","🖼️"],["Vending machine","🥤"],["Rainstorm","🌧️"],["Secret recipe","📜"],["Wrong number","📱"],["Paper boat","⛵"],["Lost passport","🛂"],["Street musician","🎻"]];
+const EMOTIONS = ["nervous","jealous","hopeful","embarrassed","furious","nostalgic","relieved","suspicious"];
+const PLACES = ["a train station","a hospital waiting room","a village wedding","a rooftop","a night market","a college hostel","a beach at dawn","an office at midnight"];
+const EXPLAIN = ["Blockchain","Artificial intelligence","Capitalism","Photosynthesis","The internet","Inflation","Machine learning","Your job","Your final-year project","Democracy","Cloud computing","How vaccines work","Black holes","Cryptocurrency","The stock market","Gravity","Electricity","Climate change","Taxes","What an API is","Why the sky is blue","How Wi-Fi works","Supply and demand"];
+const PITCH = ["A water bottle","A useless app","A rock","A broken chair","A nap","A pair of mismatched socks","Yesterday's newspaper","An umbrella for indoor use","A haunted house","A used pencil","A silent alarm clock","A time machine that only goes back five minutes","A weekly power cut","A mountain of homework","A brick"];
+const INTERVIEW = {
+  "HR": ["Tell me about yourself.","Why should we hire you?","What is your biggest weakness?","Where do you see yourself in five years?","Why do you want to work here?","What are your salary expectations?"],
+  "Behavioral": ["Tell me about a time you failed.","Describe a conflict with a teammate and how you handled it.","Tell me about a time you led without being in charge.","Describe a deadline you almost missed.","Tell me about a time you changed your mind."],
+  "Technical": ["Explain your best project to a non-technical person.","How would you debug a web page that loads slowly?","What is the difference between a process and a thread?","Walk me through how you would design a URL shortener.","Which technology are you most excited about, and why?"],
+  "Situational": ["Your manager gives feedback you disagree with. What do you do?","You find a serious bug the day before launch. What now?","A teammate is not pulling their weight. What do you do?","You are given a task you have never done. How do you start?","Two stakeholders want opposite things. How do you decide?"],
+  "Weird": ["If you were an animal, which would you be and why?","Sell me this pen.","How many tennis balls fit in a bus?","What would your worst enemy say about you?","You have one hour alone in an empty office. What do you do?"]
+};
+const SMALLTALK = {
+  "Networking": ["You are standing next to a stranger at a conference. Start a conversation.","Introduce yourself to a senior person in 20 seconds.","Someone asks what you do. Answer so they want to ask a follow-up.","You forgot someone's name. Recover gracefully.","End a conversation politely so you can move on."],
+  "Workplace": ["You are in the lift with your CEO. Say something memorable.","Give a 30-second update on a project that is behind schedule.","Decline extra work without sounding lazy.","Ask a colleague for help without sounding helpless.","Thank a teammate so it sounds sincere."],
+  "Social": ["Compliment a stranger without being weird.","Rescue a conversation that has gone silent.","Say no to an invitation politely.","Explain what you do to your grandparent.","Tell a friend something honest but kind."]
+};
+const KEEP = ["Your first day at college","Your favorite place in the world","A day that went completely wrong","What you did last weekend","Your dream trip","A person who influenced you","Your favorite food and why","Your morning routine","The town you grew up in","Something you are learning right now","Your last birthday","The best meal you have ever had"];
+const STARTS = ["Rain","Coffee","Bus","Music","Window","Money","Exam","Friday","Sun","Phone","Tea","Road","Monday","Sea","Cake","Mirror"];
+const TOPICS = ["your college life","your morning routine","your best friend","your hometown","your last holiday","your favorite food","your dream job","your phone","a movie you watched recently","your family","the past week","something you are learning"];
+const WORDS = [
+  {c:"Everyday",w:"Articulate",pos:"adjective / verb",def:"able to say what you mean clearly",instead:"I don't know how to explain it.",tryIt:"I can't quite articulate what I'm trying to say.",story:"Tell me about a time you found it hard to explain how you felt."},
+  {c:"Everyday",w:"Spontaneous",pos:"adjective",def:"done on a whim, without planning",instead:"I just did it without thinking.",tryIt:"It was completely spontaneous.",story:"Tell me about the most spontaneous thing you have ever done."},
+  {c:"Everyday",w:"Hectic",pos:"adjective",def:"very busy and rushed",instead:"It was a really busy week.",tryIt:"It has been a hectic week.",story:"Describe the most hectic day you have had."},
+  {c:"Everyday",w:"Mundane",pos:"adjective",def:"ordinary and a little boring",instead:"It was just a normal, boring day.",tryIt:"It was a pretty mundane day, honestly.",story:"Tell me about something mundane that turned out to be interesting."},
+  {c:"Professional",w:"Streamline",pos:"verb",def:"make a process simpler and faster",instead:"We should make this easier.",tryIt:"We should streamline this process.",story:"Tell me about a process you would simplify."},
+  {c:"Professional",w:"Leverage",pos:"verb",def:"use something you have to get a better result",instead:"We can use our strengths here.",tryIt:"We can leverage our strengths here.",story:"Tell me about a strength you have used to your advantage."},
+  {c:"Professional",w:"Bandwidth",pos:"noun",def:"the time and energy you have for more work",instead:"I'm too busy right now.",tryIt:"I don't have the bandwidth for that right now.",story:"Tell me about a time you had too much on your plate."},
+  {c:"Professional",w:"Pragmatic",pos:"adjective",def:"focused on what works in practice",instead:"Let's just do what works.",tryIt:"Let's be pragmatic about this.",story:"Tell me about a practical decision you made."},
+  {c:"Opinions",w:"Nuanced",pos:"adjective",def:"not black and white; full of small differences",instead:"It's complicated.",tryIt:"It's a more nuanced issue than that.",story:"Tell me about an issue that is more complicated than people think."},
+  {c:"Opinions",w:"Overrated",pos:"adjective",def:"thought to be better than it really is",instead:"Everyone likes it but I don't get it.",tryIt:"Honestly, I think it's overrated.",story:"Tell me about something popular that you think is overrated."},
+  {c:"Opinions",w:"Skeptical",pos:"adjective",def:"doubtful until you see proof",instead:"I don't fully believe it.",tryIt:"I'm skeptical until I see the data.",story:"Tell me about something you were skeptical about, and what changed your mind."},
+  {c:"Opinions",w:"Compelling",pos:"adjective",def:"so convincing or interesting you can't ignore it",instead:"That's a really good point.",tryIt:"That's a compelling argument.",story:"Tell me about the most convincing argument you have heard."},
+  {c:"Emotions",w:"Nostalgic",pos:"adjective",def:"sentimental about the past",instead:"I miss those days.",tryIt:"I feel nostalgic about those days.",story:"Tell me about something that makes you nostalgic."},
+  {c:"Emotions",w:"Overwhelmed",pos:"adjective",def:"buried under more than you can handle",instead:"I have too much going on.",tryIt:"I'm feeling a bit overwhelmed right now.",story:"Tell me about a time you felt overwhelmed, and what helped."},
+  {c:"Emotions",w:"Elated",pos:"adjective",def:"extremely happy and excited",instead:"I was really happy.",tryIt:"I was absolutely elated.",story:"Tell me about a moment you felt elated."},
+  {c:"Emotions",w:"Apprehensive",pos:"adjective",def:"a little anxious about what is coming",instead:"I'm a bit scared about it.",tryIt:"I'm apprehensive about how it will go.",story:"Tell me about something you felt apprehensive about that turned out fine."},
+  {c:"Debate",w:"Concede",pos:"verb",def:"admit the other side has a point",instead:"Okay, you're right.",tryIt:"I'll concede that point, but here's my concern.",story:"Tell me about a time you had to admit you were wrong."},
+  {c:"Debate",w:"Counterargument",pos:"noun",def:"a point made against someone's claim",instead:"But someone could say the opposite.",tryIt:"The strongest counterargument is cost.",story:"Argue against something you strongly believe."},
+  {c:"Debate",w:"Premise",pos:"noun",def:"the starting assumption of an argument",instead:"That's what you're assuming.",tryIt:"I disagree with the premise of that question.",story:"Tell me about an assumption you used to make that turned out wrong."},
+  {c:"Debate",w:"Undermine",pos:"verb",def:"weaken something, often gradually",instead:"That makes it worse.",tryIt:"That would undermine trust in the team.",story:"Tell me about something that undermined your confidence, and how you recovered."}
+];
+const SWAPS = [
+  {a:"I think…",b:"I'd argue that…",ex:"I'd argue that remote work is here to stay."},
+  {a:"Basically…",b:"Essentially…",ex:"Essentially, the plan is to launch in two phases."},
+  {a:"Something like…",b:"Something along the lines of…",ex:"We're aiming for something along the lines of fifty users."},
+  {a:"I don't know.",b:"I'm not sure yet, but my instinct is…",ex:"I'm not sure yet, but my instinct is to test it first."},
+  {a:"Um, wait.",b:"Give me a moment to organize my thoughts.",ex:"Give me a moment to organize my thoughts, then I'll answer."},
+  {a:"You know what I mean?",b:"Does that make sense?",ex:"So that's the timeline. Does that make sense?"},
+  {a:"It's really important.",b:"It's critical.",ex:"Testing before launch is critical."},
+  {a:"I disagree.",b:"I see it a little differently.",ex:"I see it a little differently, because the data shows otherwise."},
+  {a:"I'm bad at this.",b:"I'm still getting the hang of this.",ex:"I'm still getting the hang of public speaking."},
+  {a:"Sorry, I'm late.",b:"Thanks for waiting.",ex:"Thanks for waiting, let's get started."},
+  {a:"Can you repeat that?",b:"Could you say a bit more about that?",ex:"Could you say a bit more about the second point?"},
+  {a:"And then, and then…",b:"First… next… finally…",ex:"First we planned, next we built, finally we tested."},
+  {a:"A lot of…",b:"A significant number of…",ex:"A significant number of students skip breakfast."},
+  {a:"That's a good question.",b:"Let me think about that for a second.",ex:"Let me think about that for a second before I answer."}
+];
+const FILLERS = ["um","uh","uhm","er","erm","like","you know","basically","actually","literally","i mean","kind of","sort of","honestly"];
+const FILLER_RE = new RegExp('\\b(' + FILLERS.slice().sort((a, b) => b.length - a.length).join('|') + ')\\b', 'gi');
+const FW = { PREP: ["Point","Reason","Example","Point again"], STAR: ["Situation","Task","Action","Result"], PEEL: ["Point","Evidence","Explain","Link back"] };
+
+/* ---------- game definitions ---------- */
+const poolGen = data => (st, rng = Math.random) => {
+  const flat = Array.isArray(data) ? data : Object.values(data).flat();
+  const pool = (!Array.isArray(data) && st.cat && st.cat !== 'Random') ? data[st.cat] : flat;
+  let t, tries = 0;
+  do { t = pick(pool, rng); } while (st.p && st.p.text === t && pool.length > 1 && ++tries < 10);
+  return { text: t };
+};
+const plainRender = p => `<p class="prompt">${esc(p.text)}</p>`;
+const catsOf = data => ['Random', ...Object.keys(data)];
+
+const GROUPS = [
+  { id: 'warm', name: 'Warm up', blurb: 'Low pressure. Get your voice moving.', tone: 'mint' },
+  { id: 'fast', name: 'Think fast', blurb: 'Short clocks. Start before you feel ready.', tone: 'butter' },
+  { id: 'speak', name: 'Speak', blurb: 'Longer turns. Build the stamina.', tone: 'pink' },
+  { id: 'real', name: 'Real life', blurb: 'The conversations you will actually have.', tone: 'lav' }
+];
+
+const GAMES = [
+  { id: 'drop', group: 'warm', name: 'Word Drop', emoji: '📖', blurb: 'Get a word, then talk. Work it in naturally.', kind: 'generic', big: true,
+    cats: ['All', 'Everyday', 'Professional', 'Opinions', 'Emotions', 'Debate'], times: [30, 60, 90], time: 30,
+    tip: 'Did the word feel natural, or forced? Try it in a different context next round.',
+    gen(st, rng = Math.random) { const pool = WORDS.filter(w => st.cat === 'All' || st.cat === 'Random' || w.c === st.cat); let w, t = 0; do { w = pick(pool, rng); } while (st.p && st.p.w === w && pool.length > 1 && ++t < 10); return { w, text: w.w }; },
+    render(p, st) { const w = p.w; return `<span class="pos">${esc(w.pos)}</span><p class="prompt bigword">${esc(w.w)}</p><p class="def">${esc(w.def)}</p><div class="swap"><div><span class="lbl">Instead of saying</span><p>“${esc(w.instead)}”</p></div><div class="try"><span class="lbl">Try this</span><p>“${esc(w.tryIt)}”</p></div></div><p class="challenge">Talk for ${fmtTime(st.time)} about anything you like, and use “${esc(w.w)}” naturally at least once. Stuck? ${esc(w.story)}</p>`; } },
+  { id: 'chain', group: 'warm', name: 'Word Chain', emoji: '🔗', blurb: 'Word after word before the clock runs out.', kind: 'custom', mount: mountChain },
+  { id: 'better', group: 'warm', name: 'Say It Better', emoji: '✨', blurb: 'Swap weak phrases for ones that sound sharper.', kind: 'custom', mount: mountBetter },
+
+  { id: 'impromptu', group: 'fast', name: 'Impromptu', emoji: '🎲', blurb: 'A random topic, a prep timer, then speak.', kind: 'generic',
+    cats: catsOf(IMPROMPTU), preps: [0, 15, 30], prep: 30, times: [30, 60, 120, 180], time: 60, frameworks: true,
+    tip: 'Did you finish with a clear last sentence, or trail off?', gen: poolGen(IMPROMPTU), render: plainRender },
+  { id: 'brain', group: 'fast', name: '30-Second Brain', emoji: '⚡', blurb: 'One question, thirty seconds, no freezing.', kind: 'generic',
+    times: [20, 30, 45], time: 30, tip: 'Did you start talking within two seconds? That first sentence is the whole skill.', gen: poolGen(BRAIN), render: plainRender },
+  { id: 'hot', group: 'fast', name: 'Hot Take', emoji: '🔥', blurb: 'Defend or destroy a ridiculous opinion.', kind: 'generic',
+    preps: [0, 10, 20], prep: 10, times: [30, 60, 90], time: 60, flip: true,
+    tip: 'What was your strongest reason? Could you say it in one sentence?',
+    gen(st, rng = Math.random) { const p = poolGen(HOT)(st, rng); p.stance = rng() < 0.5 ? 'Defend' : 'Destroy'; return p; },
+    render: p => `<span class="stance">${p.stance === 'Defend' ? 'Defend it' : 'Destroy it'}</span><p class="prompt">“${esc(p.text)}”</p>`, text: p => `${p.stance === 'Defend' ? 'Defend' : 'Destroy'}: ${p.text}` },
+  { id: 'connect', group: 'fast', name: 'Word Connect', emoji: '🧩', blurb: 'Explain how two unrelated things connect.', kind: 'generic',
+    times: [15, 20, 30, 45], time: 20, tip: 'Was your link funny, logical, or both?',
+    gen(st, rng = Math.random) { let pr, t = 0; do { pr = pick(PAIRS, rng); } while (st.p && st.p.a === pr[0] && ++t < 10); return { a: pr[0], b: pr[1] }; },
+    render: p => `<div class="pair"><span>${esc(p.a)}</span><b>+</b><span>${esc(p.b)}</span></div><p class="sub">Explain the connection.</p>`, text: p => `${p.a} + ${p.b}` },
+
+  { id: 'story', group: 'speak', name: 'Story Builder', emoji: '🎭', blurb: 'Tell a story using random objects.', kind: 'generic',
+    levels: ['Easy', 'Medium', 'Hard', 'Chaos'], preps: [0, 10, 30], prep: 10, times: [60, 90, 120], time: 60,
+    tip: 'Did your story have a beginning, a problem, and an ending?',
+    gen(st, rng = Math.random) { const n = { Easy: 2, Medium: 3, Hard: 5, Chaos: 5 }[st.level] || 3; const p = { items: shuffle(OBJECTS, rng).slice(0, n) }; if (st.level === 'Chaos') { p.emotion = pick(EMOTIONS, rng); p.place = pick(PLACES, rng); } return p; },
+    render: p => `<p class="sub">Tell a story that uses all of these.</p><ul class="items">${p.items.map(i => `<li class="item">${i[1]} ${esc(i[0])}</li>`).join('')}${p.emotion ? `<li class="item">Feeling: ${esc(p.emotion)}</li><li class="item">Place: ${esc(p.place)}</li>` : ''}</ul>`,
+    text: p => p.items.map(i => i[0]).join(', ') },
+  { id: 'explain', group: 'speak', name: 'Explain It', emoji: '👶', blurb: 'Explain something hard without the jargon.', kind: 'generic',
+    preps: [0, 10, 20], prep: 10, times: [30, 60, 90], time: 60, tip: 'Would a ten-year-old have followed you? Which word was too technical?',
+    gen: poolGen(EXPLAIN), render: p => `<p class="sub">Explain this like I'm 5. No jargon.</p><p class="prompt">${esc(p.text)}</p>` },
+  { id: 'keep', group: 'speak', name: 'Keep Talking', emoji: '🗣️', blurb: 'Go quiet for two seconds and you lose.', kind: 'custom', mount: mountKeep },
+  { id: 'pitch', group: 'speak', name: 'Pitch It', emoji: '🎤', blurb: 'Sell something that should not be sold.', kind: 'generic',
+    preps: [0, 15, 30], prep: 15, times: [30, 60, 90], time: 60, tip: 'Did you say who it is for and why they need it right now?',
+    gen: poolGen(PITCH), render: p => `<p class="sub">Convince me I need this.</p><p class="prompt">${esc(p.text)}</p>` },
+  { id: 'filler', group: 'speak', name: 'Filler Killer', emoji: '🎙️', blurb: 'Count your ums, likes and you-knows.', kind: 'custom', mount: mountFiller },
+
+  { id: 'interview', group: 'real', name: 'Interview Attack', emoji: '💼', blurb: 'Quick drills for the questions you dread.', kind: 'generic',
+    cats: catsOf(INTERVIEW), preps: [0, 15, 30], prep: 15, times: [60, 90, 120], time: 60, frameworks: true,
+    tip: 'Did you give one specific example instead of a general answer?', gen: poolGen(INTERVIEW), render: plainRender },
+  { id: 'smalltalk', group: 'real', name: 'Small Talk', emoji: '☕', blurb: 'Networking and workplace moments in 30 seconds.', kind: 'generic',
+    cats: catsOf(SMALLTALK), times: [20, 30, 45], time: 30, tip: 'Did you end with a question or a next step so the other person had something to say?',
+    gen: poolGen(SMALLTALK), render: plainRender }
+];
+const SPIN_HINT = { drop: 'Spin to get your word', impromptu: 'Spin to get your topic', brain: 'Spin for a question', hot: 'Spin for a hot take', connect: 'Spin for a pair', story: 'Spin for your story ingredients', explain: 'Spin for something to explain', pitch: 'Spin for something to sell', interview: 'Spin for an interview question', smalltalk: 'Spin for a situation' };
+GAMES.forEach(g => { g.tone = GROUPS.find(x => x.id === g.group).tone; if (g.kind === 'generic') { if (!g.text) g.text = p => p.text; g.spinHint = SPIN_HINT[g.id] || 'Spin to get a prompt'; } });
+const GENERIC = GAMES.filter(g => g.kind === 'generic');
+
+function defaultsFor(g) { return { cat: g.id === 'drop' ? 'All' : 'Random', level: 'Medium', prep: g.prep || 0, time: g.time, fw: 'None', p: null }; }
+function dailyPick() {
+  const rng = mulberry32(hashStr('say-something:' + store.today()));
+  const g = GENERIC[Math.floor(rng() * GENERIC.length)];
+  const st = defaultsFor(g);
+  return { g, p: g.gen(st, rng) };
+}
+
+/* ---------- shared UI bits ---------- */
+function chipRow(label, name, options, cur, labelFn) {
+  return `<div class="setrow"><span class="setlabel">${esc(label)}</span><div class="chips" role="group" aria-label="${esc(label)}">${options.map(o => `<button type="button" class="chip" data-set="${name}" data-val="${esc(o)}" aria-pressed="${String(o) === String(cur)}">${esc(labelFn ? labelFn(o) : o)}</button>`).join('')}</div></div>`;
+}
+function shell(g, inner, cls = '') {
+  return `<div class="stage ${cls}" style="--tone:var(--${g.tone})"><a class="back" href="#/">All games</a><h2 class="stage-title"><span aria-hidden="true">${g.emoji}</span> ${esc(g.name)}</h2>${inner}</div>`;
+}
+let seed = null;
+
+/* ---------- routing ---------- */
+function route() {
+  runCleanups();
+  app.onclick = null; app.onkeydown = null;
+  const parts = (location.hash || '#/').replace(/^#\/?/, '').split('/');
+  window.scrollTo(0, 0);
+  if (parts[0] === 'play') {
+    const g = GAMES.find(x => x.id === parts[1]);
+    if (g) {
+      if (parts[2] === 'daily' && g.kind === 'generic') { const d = dailyPick(); if (d.g.id === g.id) seed = { gameId: g.id, p: d.p }; }
+      if (g.kind === 'generic') mountGeneric(g); else g.mount(g);
+      return;
+    }
+  }
+  renderHome();
+}
+
+/* ---------- home ---------- */
+let heroText = null;
+function renderHome() {
+  const flat = Object.values(IMPROMPTU).flat();
+  heroText = heroText || pick(flat);
+  const d = dailyPick();
+  app.innerHTML = `
+    <section class="hero">
+      <div>
+        <h1>Say<br>something.</h1>
+        <p class="lede">Tiny games for people who want to get better at talking. Open it for ten minutes, pick a square, speak.</p>
+      </div>
+      <div class="bubble c-lav">
+        <p class="sub">Try this one</p>
+        <p class="prompt" id="heroText">${esc(heroText)}</p>
+        <div class="hb-actions" style="margin-top:1.25rem">
+          <button type="button" class="btn" data-act="hero-go">Speak on this</button>
+          <button type="button" class="btn ghost" data-act="hero-shuffle">Different topic</button>
+        </div>
+      </div>
+    </section>
+    <a class="daily c-${d.g.tone}" href="#/play/${d.g.id}/daily">
+      <span class="ico" aria-hidden="true">${d.g.emoji}</span>
+      <span class="txt"><strong>Today's challenge: ${esc(d.g.name)}</strong><span class="q">${esc(d.g.text(d.p))}</span></span>
+      <span class="btn">Play</span>
+    </a>
+    ${GROUPS.map(gr => `
+      <section class="group c-${gr.tone}" aria-labelledby="g-${gr.id}">
+        <div class="ghead"><h2 id="g-${gr.id}"><span class="dot" aria-hidden="true"></span>${gr.name}</h2><p>${gr.blurb}</p></div>
+        <div class="grid">
+          ${GAMES.filter(g => g.group === gr.id).map(g => `<a class="card" href="#/play/${g.id}"><span class="emoji" aria-hidden="true">${g.emoji}</span><h3>${esc(g.name)}</h3><p>${esc(g.blurb)}</p></a>`).join('')}
+        </div>
+      </section>`).join('')}
+    <p class="foot">Everything runs in your browser. Games that record use your microphone, and the recording stays in your browser until you leave the page. Your round count and streak stay on this device.</p>`;
+  app.onclick = e => {
+    const t = e.target.closest('[data-act]'); if (!t) return;
+    if (t.dataset.act === 'hero-shuffle') { let n; do { n = pick(flat); } while (n === heroText); heroText = n; $('#heroText').textContent = n; }
+    if (t.dataset.act === 'hero-go') { seed = { gameId: 'impromptu', p: { text: heroText } }; location.hash = '#/play/impromptu'; }
+  };
+}
+
+/* ---------- ring timer ---------- */
+function ringHTML(digits, label) {
+  return `<div class="ringwrap"><svg class="ring" viewBox="0 0 200 200" aria-hidden="true"><circle class="base" cx="100" cy="100" r="88"/><circle class="chan" cx="100" cy="100" r="88"/><circle class="prog" id="prog" cx="100" cy="100" r="88" pathLength="100" stroke-dasharray="100 100" transform="rotate(-90 100 100)"/></svg><div class="ringtxt"><div class="digits" id="digits">${digits}</div><div class="ringlabel">${esc(label)}</div></div></div>`;
+}
+function tickRing(left, total, low) {
+  const d = $('#digits', app), p = $('#prog', app), s = $('.stage', app);
+  if (!d || !p) return;
+  d.textContent = fmt(left);
+  p.style.strokeDashoffset = String((1 - Math.max(0, left) / total) * 100);
+  p.style.opacity = left <= 0.05 ? '0' : '1';
+  if (s) s.classList.toggle('low', !!low);
+}
+
+/* ---------- recorder: microphone + levels + speech-to-text ---------- */
+function makeRecorder() {
+  const SRc = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let stream = null, ctx = null, an = null, buf = null, mr = null, chunks = [], mon = null, sr = null;
+  let frames = [], finalT = '', interim = '', t0 = 0, running = false, srError = '', srDead = false, audioUrl = '', dead = false;
+  const api = {
+    hasSR: !!SRc,
+    async init() {
+      if (stream) return true;
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return false;
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (dead) { api.release(); return false; }
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = ctx.createMediaStreamSource(stream);
+        an = ctx.createAnalyser(); an.fftSize = 1024; buf = new Uint8Array(an.fftSize); src.connect(an);
+        return true;
+      } catch (e) { api.release(); return false; }
+    },
+    level() {
+      if (!an) return 0;
+      an.getByteTimeDomainData(buf);
+      let s = 0; for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; s += v * v; }
+      return Math.sqrt(s / buf.length);
+    },
+    start(cb) {
+      if (audioUrl) { try { URL.revokeObjectURL(audioUrl); } catch (e) {} audioUrl = ''; }
+      frames = []; chunks = []; finalT = ''; interim = ''; srError = ''; srDead = false; running = true; t0 = performance.now();
+      try {
+        if (window.MediaRecorder && stream) { mr = new MediaRecorder(stream); mr.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); }; mr.start(); }
+      } catch (e) { mr = null; }
+      mon = setInterval(() => { const v = api.level(), t = performance.now() - t0; frames.push({ t, v }); cb && cb(v, t); }, 50);
+      if (SRc) {
+        try {
+          sr = new SRc(); sr.continuous = true; sr.interimResults = true;
+          sr.lang = /-IN$/i.test(navigator.language || '') ? 'en-IN' : 'en-US';
+          sr.onresult = e => { interim = ''; for (let i = e.resultIndex; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) finalT += r[0].transcript + ' '; else interim += r[0].transcript; } };
+          sr.onerror = e => { if (e.error === 'no-speech' || e.error === 'aborted') return; srError = e.error; srDead = true; };
+          sr.onend = () => { if (running && !srDead && !dead) { try { sr.start(); } catch (e) {} } };
+          sr.start();
+        } catch (e) { sr = null; srError = 'unavailable'; }
+      }
+    },
+    live() { return (finalT + interim).trim(); },
+    async stop() {
+      running = false; clearInterval(mon); mon = null;
+      const duration = (performance.now() - t0) / 1000;
+      try { if (sr) { sr.onend = null; sr.stop(); } } catch (e) {}
+      const mrDone = new Promise(res => { if (mr && mr.state !== 'inactive') { mr.onstop = () => res(); try { mr.stop(); } catch (e) { res(); } } else res(); });
+      await Promise.all([mrDone, new Promise(r => setTimeout(r, 600))]);
+      if (chunks.length) { try { audioUrl = URL.createObjectURL(new Blob(chunks, { type: (mr && mr.mimeType) || 'audio/webm' })); } catch (e) {} }
+      const out = { transcript: (finalT + interim).trim(), frames, duration, audioUrl, srError, hasSR: !!SRc };
+      api.release();
+      return out;
+    },
+    release() { try { stream && stream.getTracks().forEach(t => t.stop()); } catch (e) {} try { ctx && ctx.close(); } catch (e) {} stream = null; ctx = null; an = null; },
+    destroy() {
+      dead = true; running = false; clearInterval(mon);
+      try { if (sr) { sr.onend = null; sr.abort(); } } catch (e) {}
+      try { if (mr && mr.state !== 'inactive') mr.stop(); } catch (e) {}
+      api.release();
+      if (audioUrl) { try { URL.revokeObjectURL(audioUrl); } catch (e) {} }
+    }
+  };
+  return api;
+}
+
+/* ---------- analysis ---------- */
+const STOP = new Set(['that','this','with','have','they','from','what','there','their','about','would','which','when','were','been','then','than','them','some','more','also','into','your','only','other','over','much','will','could','should','because','where','these','those','being','does','dont','cant','wont','make','made','going','want','okay','yeah']);
+function buildAnalysis(r, opts = {}) {
+  const text = r.transcript || '';
+  const a = { text, dur: r.duration || 0, audioUrl: r.audioUrl || '', hasText: !!text, hasAudio: !!(r.frames && r.frames.length > 20), srError: r.srError || '', hasSR: r.hasSR, target: opts.target || null };
+  const words = text.toLowerCase().match(/[a-z]+(?:'[a-z]+)?/g) || [];
+  a.words = words.length;
+  a.fillers = analyze(text);
+  const good = [], fix = [];
+
+  if (a.hasAudio) {
+    const fr = r.frames, vals = fr.map(x => x.v).sort((x, y) => x - y);
+    const floor = vals[Math.floor(vals.length * 0.1)], peak = vals[Math.floor(vals.length * 0.95)];
+    const thr = Math.max(0.012, floor + (peak - floor) * 0.25);
+    a.quiet = peak < 0.03;
+    const v = fr.map(x => x.v > thr);
+    for (let i = 0; i < v.length;) {
+      if (v[i]) { i++; continue; }
+      let j = i; while (j < v.length && !v[j]) j++;
+      if (i > 0 && j < v.length && fr[j].t - fr[i - 1].t < 350) for (let k = i; k < j; k++) v[k] = true;
+      i = j;
+    }
+    const first = v.indexOf(true), last = v.lastIndexOf(true);
+    if (first < 0) { a.silent = true; }
+    else {
+      a.startDelay = fr[first].t / 1000;
+      a.window = (fr[last].t - fr[first].t) / 1000;
+      a.tail = Math.max(0, a.dur - fr[last].t / 1000);
+      const pauses = [];
+      for (let i = first; i <= last;) {
+        if (v[i]) { i++; continue; }
+        let j = i; while (j <= last && !v[j]) j++;
+        const len = (fr[Math.min(j, last)].t - fr[i].t) / 1000;
+        if (len >= 1) pauses.push(len);
+        i = j;
+      }
+      a.pauses = pauses.length; a.longestPause = pauses.length ? Math.max(...pauses) : 0;
+      const lv = []; for (let k = first; k <= last; k++) if (v[k] && fr[k].v > thr) lv.push(fr[k].v);
+      if (lv.length > 20) {
+        const m = lv.reduce((p, c) => p + c, 0) / lv.length, sd = Math.sqrt(lv.reduce((p, c) => p + (c - m) * (c - m), 0) / lv.length);
+        a.cv = sd / m; a.voice = a.cv < 0.35 ? 'flat' : a.cv < 0.7 ? 'natural' : 'lively';
+      }
+    }
+  }
+  if (a.hasText && a.words >= 8) {
+    const secs = a.window && a.window >= 5 ? a.window : a.dur;
+    if (secs > 0) a.wpm = Math.round(a.words / (secs / 60));
+  }
+  if (a.words >= 40) a.variety = Math.round(new Set(words).size / a.words * 100);
+  const freq = {}; words.forEach(w => { if (w.length >= 4 && !STOP.has(w)) freq[w] = (freq[w] || 0) + 1; });
+  a.repeated = Object.entries(freq).filter(([, n]) => n >= Math.max(4, Math.round(a.words / 30))).sort((x, y) => y[1] - x[1]).slice(0, 2);
+  if (a.target) {
+    const stem = a.target.toLowerCase().slice(0, Math.max(4, a.target.length - 2));
+    a.targetUses = words.filter(w => w.startsWith(stem)).length;
+  }
+
+  // tips
+  if (a.quiet) fix.push('The recording was very quiet. Move closer to the mic or speak up a little.');
+  if (a.wpm) {
+    if (a.wpm >= 115 && a.wpm <= 165) good.push(`Your pace (${a.wpm} words a minute) is in the comfortable range.`);
+    else if (a.wpm > 165) fix.push(`You spoke fast at ${a.wpm} words a minute. Aim for 120 to 160 and let the end of each sentence land.`);
+    else if (a.wpm < 100) fix.push(`Your pace was slow (${a.wpm} words a minute). If you were hunting for words, keep going with simpler ones.`);
+  }
+  if (a.hasText && a.words >= 15) {
+    const t = a.fillers.total, top = Object.entries(a.fillers.counts).sort((x, y) => y[1] - x[1])[0];
+    const perMin = a.dur >= 20 ? t / (a.dur / 60) : null;
+    if (t === 0) good.push('No filler words caught.');
+    else if (t >= 8 || (perMin !== null && perMin >= 6)) fix.push(`Filler words showed up ${t} times, mostly “${top[0]}”. Swap them for a short silent pause.`);
+    else good.push(`Filler words stayed low (${t}).`);
+  }
+  if (a.pauses !== undefined) {
+    if (a.pauses >= 3 || a.longestPause >= 3) fix.push(`You went quiet ${a.pauses} ${a.pauses === 1 ? 'time' : 'times'} (longest ${a.longestPause.toFixed(1)}s). Keep a bridge phrase ready, like “the way I see it is…”.`);
+    else if (a.window >= 15) good.push('You kept the flow going with few long pauses.');
+  }
+  if (a.startDelay !== undefined) {
+    if (a.startDelay >= 4) fix.push(`It took ${a.startDelay.toFixed(1)} seconds to start talking. Open with a stock line while you find your point.`);
+    else if (a.startDelay <= 2) good.push('You started right away.');
+  }
+  if (a.tail !== undefined && a.tail >= 10 && a.dur >= 30) fix.push(`You stopped talking ${Math.round(a.tail)} seconds before time ran out. Add one more example or a closing line.`);
+  if (a.variety !== undefined && a.variety < 45) fix.push('You reused the same words a lot. Try a few synonyms.');
+  a.repeated.forEach(([w, n]) => fix.push(`You leaned on “${w}” ${n} times.`));
+  if (a.voice === 'flat') fix.push('Your volume stayed very even. Stress the key word in each sentence.');
+  if (a.target && a.hasText) {
+    if (a.targetUses > 0) good.push(`You used “${a.target}” ${a.targetUses} ${a.targetUses === 1 ? 'time' : 'times'}.`);
+    else fix.push(`You never used “${a.target}”. Try dropping it into your first sentence.`);
+  }
+  a.good = good; a.fix = fix;
+  if (!a.hasText) a.note = !r.hasSR ? 'This browser has no speech recognition, so pace and filler words could not be measured. Chrome or Edge works best.' : r.srError ? `Speech recognition did not work (${r.srError}), so pace and filler words could not be measured.` : 'No words were picked up, so pace and filler words could not be measured.';
+  return a;
+}
+function reportHTML(a) {
+  const stat = (b, s, note) => `<div class="stat"><b>${esc(b)}</b><span>${esc(s)}</span>${note ? `<small>${esc(note)}</small>` : ''}</div>`;
+  let stats = '';
+  if (a.wpm) stats += stat(a.wpm, 'words per minute', a.wpm > 165 ? 'a bit fast' : a.wpm < 100 ? 'on the slow side' : 'comfortable');
+  if (a.hasText) stats += stat(a.fillers.total, 'filler words', a.fillers.total === 0 ? 'clean' : a.dur >= 20 ? (a.fillers.total / (a.dur / 60)).toFixed(1) + ' per minute' : '');
+  if (a.pauses !== undefined) stats += stat(a.pauses, 'pauses over 1 sec', a.pauses ? 'longest ' + a.longestPause.toFixed(1) + 's' : 'none');
+  if (a.startDelay !== undefined) stats += stat(a.startDelay.toFixed(1) + 's', 'to start talking');
+  if (a.variety !== undefined) stats += stat(a.variety + '%', 'word variety');
+  if (a.voice) stats += stat(a.voice, 'vocal energy');
+  if (a.target && a.hasText) stats += stat(a.targetUses + '×', `“${a.target}” used`);
+  const top = Object.entries(a.fillers.counts).sort((x, y) => y[1] - x[1]);
+  const list = arr => `<ul>${arr.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+  return `<section class="report"><h3>How you spoke</h3>
+    ${a.silent ? '<div class="note-box"><p>The mic did not pick up any speech. Check that the right microphone is selected.</p></div>' : ''}
+    ${a.note ? `<div class="note-box"><p>${esc(a.note)}</p></div>` : ''}
+    ${stats ? `<div class="stats">${stats}</div>` : ''}
+    ${a.good.length || a.fix.length ? `<div class="notes">${a.good.length ? `<div class="g"><h4>What worked</h4>${list(a.good)}</div>` : ''}${a.fix.length ? `<div class="f"><h4>Work on next</h4>${list(a.fix)}</div>` : ''}</div>` : ''}
+    ${top.length ? `<div class="chain">${top.map(([k, n]) => `<span class="pill">${esc(k)} <small>× ${n}</small></span>`).join('')}</div>` : ''}
+    ${a.audioUrl ? `<div class="listen"><span class="lbl">Listen back</span><audio controls src="${a.audioUrl}"></audio></div>` : ''}
+    ${a.hasText ? `<p class="lbl" style="margin:1rem 0 .3rem">What we heard</p><div class="transcript">${a.fillers.html}</div><p class="privacy" style="margin-top:0">Speech-to-text often hides ums and uhs, so filler counts are a minimum.</p>` : ''}
+  </section>`;
+}
+
+/* ---------- generic prompt-and-speak game ---------- */
+function mountGeneric(g) {
+  const st = defaultsFor(g);
+  st.rec = store.data.rec === false ? 'Off' : 'On';
+  let phase = 'idle', timer = null, spoken = 0, spinning = false, reel = null, spinT = null, landed = false, notice = '', analysis = null, micOk = false, dead = false, busy = false;
+  const recorder = makeRecorder();
+  const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (seed && seed.gameId === g.id) { st.p = seed.p; seed = null; }
+  onLeave(() => { dead = true; timer && timer.stop(); clearTimeout(spinT); recorder.destroy(); });
+
+  function settingsHTML() {
+    let s = '';
+    if (g.cats) s += chipRow('Category', 'cat', g.cats, st.cat);
+    if (g.levels) s += chipRow('Difficulty', 'level', g.levels, st.level);
+    if (g.preps) s += chipRow('Prep time', 'prep', g.preps, st.prep, o => o ? o + ' sec' : 'None');
+    s += chipRow('Speaking time', 'time', g.times, st.time, fmtTime);
+    if (g.frameworks) s += chipRow('Framework', 'fw', ['None', 'PREP', 'STAR', 'PEEL'], st.fw, o => o === 'None' ? 'No framework' : o);
+    s += chipRow('Record & analyze', 'rec', ['On', 'Off'], st.rec);
+    return s;
+  }
+  function bubbleHTML() {
+    if (reel) return `<div class="reel ${g.big ? 'big' : ''}"><div class="strip" id="strip">${reel.map(t => `<div class="ritem"><span>${esc(t)}</span></div>`).join('')}</div></div>`;
+    if (!st.p) return `<p class="sub">${esc(g.spinHint)}</p><p class="prompt bigword qmark" aria-hidden="true">?</p>`;
+    return g.render(st.p, st);
+  }
+  function paint(focus) {
+    const running = phase === 'prep' || phase === 'speak';
+    const secs = phase === 'prep' ? st.prep : st.time;
+    const fwHTML = g.frameworks && st.fw !== 'None' ? `<ol class="fw" aria-label="${st.fw} framework">${FW[st.fw].map(x => `<li>${x}</li>`).join('')}</ol>` : '';
+    let actions = '';
+    if (!spinning) {
+      if (phase === 'idle') actions = st.p ? `<button type="button" class="btn" data-act="go">Start</button><button type="button" class="btn ghost" data-act="spin">Spin again</button>${g.flip ? '<button type="button" class="btn ghost" data-act="flip">Flip stance</button>' : ''}` : `<button type="button" class="btn" data-act="spin">Spin</button>`;
+      if (phase === 'prep') actions = `<button type="button" class="btn" data-act="skip">Skip prep</button>`;
+      if (phase === 'speak') actions = `<button type="button" class="btn" data-act="done">I'm done</button>`;
+      if (phase === 'done') actions = `<button type="button" class="btn" data-act="again">Go again</button><button type="button" class="btn ghost" data-act="newp">Spin a new one</button>`;
+    }
+    const label = { idle: 'Ready', prep: 'Get ready', speak: 'Speak', wait: 'Analyzing' }[phase];
+    const hint = phase === 'prep' ? 'Plan your first sentence.' : phase === 'wait' ? 'Working out how that went…' : phase === 'idle' ? notice : '';
+    const timerHTML = phase === 'done' ? '' : `<div class="timer">${ringHTML(fmt(phase === 'wait' ? 0 : running ? secs : st.time), label)}<p class="hint" role="status">${esc(hint)}</p>${phase === 'speak' && micOk ? '<div class="micline"><span class="rec">● Recording</span><div class="meter"><i id="lvl"></i></div></div>' : ''}</div>`;
+    const doneHTML = phase === 'done' ? `<h3 class="donehead">Done. You spoke for ${fmt(spoken)}.</h3>${analysis ? reportHTML(analysis) : (notice ? `<div class="note-box"><p>${esc(notice)}</p></div>` : '')}<div class="tip"><p>${esc(g.tip)}</p></div>` : '';
+    app.innerHTML = shell(g, `
+      <div class="settings">${settingsHTML()}</div>
+      <div class="bubble ${landed ? 'pop' : ''}">${bubbleHTML()}</div>
+      ${fwHTML}
+      ${timerHTML}
+      ${doneHTML}
+      <div class="actions">${actions}</div>`, (running || phase === 'wait' ? 'running' : '') + (phase === 'done' ? ' is-done' : ''));
+    landed = false;
+    if (focus) { const b = $('.actions .btn', app); b && b.focus(); }
+  }
+  function spin() {
+    if (spinning || busy || !(phase === 'idle' || phase === 'done')) return;
+    phase = 'idle'; analysis = null; notice = '';
+    const final = g.gen(st), N = 24, tmp = Object.assign({}, st, { p: null });
+    if (reduced) { st.p = final; landed = true; paint(true); return; }
+    const items = [st.p ? g.text(st.p) : '?'];
+    for (let i = 1; i < N - 1; i++) items.push(g.text(g.gen(tmp)));
+    items.push(g.text(final));
+    spinning = true; reel = items; paint();
+    const strip = $('#strip', app);
+    strip.getBoundingClientRect();
+    const h = strip.firstElementChild.getBoundingClientRect().height;
+    strip.style.transition = 'transform 2.8s cubic-bezier(.1,.7,.15,1)';
+    strip.style.transform = `translateY(${-h * (N - 1)}px)`;
+    const land = () => { if (!spinning || dead) return; spinning = false; clearTimeout(spinT); reel = null; st.p = final; landed = true; beep(740, 0.12); paint(true); };
+    strip.addEventListener('transitionend', land, { once: true });
+    spinT = setTimeout(land, 3300);
+  }
+  function tick(l, t, kind) { tickRing(l, t, kind === 'speak' && t > 20 && l <= 10); }
+  function begin(kind) {
+    phase = kind; paint(true); beep(kind === 'prep' ? 520 : 880);
+    if (kind === 'speak' && micOk) recorder.start(v => { const m = $('#lvl', app); if (m) m.style.width = Math.min(100, v * 400) + '%'; });
+    const secs = kind === 'prep' ? st.prep : st.time;
+    timer = countdown(secs, { onTick: (l, t) => tick(l, t, kind), onEnd: () => kind === 'prep' ? begin('speak') : finish() });
+  }
+  async function start() {
+    if (busy || spinning || !st.p) return;
+    busy = true; notice = ''; analysis = null; micOk = false; phase = 'idle';
+    if (st.rec === 'On') {
+      notice = 'Waiting for microphone permission…'; paint();
+      micOk = await recorder.init();
+      if (dead) return;
+      notice = micOk ? '' : 'Microphone unavailable, so this round will not be analyzed.';
+    }
+    busy = false;
+    st.prep > 0 ? begin('prep') : begin('speak');
+  }
+  async function finish() {
+    spoken = Math.round(timer ? timer.elapsed() : 0);
+    timer && timer.stop(); timer = null;
+    store.addRound(); beep(660);
+    if (micOk) {
+      phase = 'wait'; paint();
+      try { const rr = await recorder.stop(); if (dead) return; analysis = buildAnalysis(rr, { target: g.id === 'drop' && st.p ? st.p.w.w : null }); }
+      catch (e) { analysis = null; notice = 'Analysis failed for this round.'; }
+      micOk = false;
+    }
+    phase = 'done'; paint(true);
+  }
+  app.onclick = e => {
+    const t = e.target.closest('[data-set],[data-act]'); if (!t) return;
+    if (t.dataset.set) {
+      if (spinning || busy) return;
+      const k = t.dataset.set; let v = t.dataset.val;
+      if (k === 'prep' || k === 'time') v = +v;
+      st[k] = v;
+      if (k === 'rec') { store.data.rec = v === 'On'; store.save(); }
+      if (k === 'cat' || k === 'level') st.p = null;
+      paint();
+      return;
+    }
+    const a = t.dataset.act;
+    if (a === 'spin') spin();
+    else if (a === 'go') start();
+    else if (a === 'flip') { st.p = Object.assign({}, st.p, { stance: st.p.stance === 'Defend' ? 'Destroy' : 'Defend' }); paint(); }
+    else if (a === 'skip') { timer && timer.stop(); begin('speak'); }
+    else if (a === 'done') { timer && timer.stop(); finish(); }
+    else if (a === 'again') start();
+    else if (a === 'newp') { phase = 'idle'; analysis = null; notice = ''; spin(); }
+  };
+  paint();
+}
+
+/* ---------- Word Chain ---------- */
+function mountChain(g) {
+  let secs = 5, start = pick(STARTS), cue = start, chain = [], phase = 'idle', timer = null, t0 = 0;
+  onLeave(() => timer && timer.stop());
+  const pills = () => chain.map(c => `<span class="pill">${esc(c.word)} <small>${(c.ms / 1000).toFixed(1)}s</small></span>`).join('');
+  function paint() {
+    const idle = phase === 'idle', run = phase === 'run', over = phase === 'over';
+    const total = chain.reduce((a, c) => a + c.ms, 0);
+    const summary = chain.length ? `Average ${(total / chain.length / 1000).toFixed(1)} sec per link.` : 'You ran out of time before the first link. Say the first word that pops into your head, even if it is silly.';
+    app.innerHTML = shell(g, `
+      ${idle ? `<div class="settings">${chipRow('Time per link', 'secs', [3, 5, 8], secs, o => o + ' sec')}</div>` : ''}
+      <div class="bubble">
+        <p class="sub">${idle ? 'Say a related word, then another, then another. Start from:' : run ? 'Say a word related to:' : 'The chain broke at:'}</p>
+        <p class="prompt bigword" id="cue">${esc(cue)}</p>
+      </div>
+      ${run ? `<div class="bar"><span class="fill" id="fill"></span></div>
+        <div class="linkrow"><input class="field" id="w" autocomplete="off" autocapitalize="off" placeholder="Type your word, or just say it and press Enter" aria-label="Your word"><button type="button" class="btn" data-act="link">Link</button></div>
+        <p class="note" id="note" role="status"></p>` : ''}
+      ${over ? `<div class="tip"><p><b>${chain.length} ${chain.length === 1 ? 'link' : 'links'}.</b> ${summary}</p></div>` : ''}
+      <div class="chain" id="chain">${pills()}</div>
+      <div class="actions">${idle ? '<button type="button" class="btn" data-act="go">Start chain</button>' : ''}${over ? '<button type="button" class="btn" data-act="go">Go again</button>' : ''}</div>`, run ? 'running' : '');
+  }
+  function runLink() {
+    timer && timer.stop(); t0 = performance.now();
+    timer = countdown(secs, { onTick: (l, t) => { const f = $('#fill', app); if (f) { f.style.width = (l / t * 100) + '%'; } }, onEnd: over });
+  }
+  function begin() { chain = []; start = pick(STARTS); cue = start; phase = 'run'; paint(); beep(880); const i = $('#w', app); i && i.focus(); runLink(); }
+  function over() { timer && timer.stop(); phase = 'over'; if (chain.length >= 3) store.addRound(); beep(330, 0.25); paint(); }
+  function link() {
+    const inp = $('#w', app); if (!inp) return;
+    const v = inp.value.trim(), note = $('#note', app);
+    if (v && [start, ...chain.map(c => c.word)].some(w => w.toLowerCase() === v.toLowerCase())) { note.textContent = 'You already used that one. Try a new word.'; return; }
+    chain.push({ word: v || '…', ms: performance.now() - t0 });
+    if (v) cue = v;
+    $('#cue', app).textContent = cue; $('#chain', app).innerHTML = pills();
+    inp.value = ''; note.textContent = ''; runLink(); inp.focus();
+  }
+  app.onclick = e => {
+    const t = e.target.closest('[data-set],[data-act]'); if (!t) return;
+    if (t.dataset.set === 'secs') { secs = +t.dataset.val; paint(); }
+    else if (t.dataset.act === 'go') begin();
+    else if (t.dataset.act === 'link') link();
+  };
+  app.onkeydown = e => { if (e.key === 'Enter' && e.target.id === 'w') { e.preventDefault(); link(); } };
+  paint();
+}
+
+/* ---------- Say It Better ---------- */
+function mountBetter(g) {
+  let deck = shuffle(SWAPS), i = 0, shown = false;
+  function paint() {
+    const s = deck[i];
+    app.innerHTML = shell(g, `
+      <div class="bubble">
+        <span class="lbl">Instead of saying</span>
+        <p class="prompt">“${esc(s.a)}”</p>
+        ${shown ? `<p class="sub" style="margin-top:1.4rem">Try this</p><p class="prompt">“${esc(s.b)}”</p><p class="example">Example: ${esc(s.ex)}</p>` : ''}
+      </div>
+      <div class="actions">
+        ${shown ? `<button type="button" class="btn" data-act="said">I said it out loud</button><button type="button" class="btn ghost" data-act="skip">Skip</button>` : `<button type="button" class="btn" data-act="show">Show the upgrade</button>`}
+      </div>
+      ${shown ? '<div class="tip"><p>Now use the new phrase in a sentence about your own day. Out loud counts, in your head does not.</p></div>' : ''}`);
+    const b = $('.actions .btn', app); b && b.focus();
+  }
+  function next() { i++; if (i >= deck.length) { deck = shuffle(SWAPS); i = 0; } shown = false; paint(); }
+  app.onclick = e => {
+    const t = e.target.closest('[data-act]'); if (!t) return;
+    if (t.dataset.act === 'show') { shown = true; paint(); }
+    else if (t.dataset.act === 'said') { store.addRound(); beep(660); next(); }
+    else if (t.dataset.act === 'skip') next();
+  };
+  paint();
+}
+
+/* ---------- Keep Talking ---------- */
+function mountKeep(g) {
+  const GOALS = [30, 60, 90, 120];
+  const rec = makeRecorder();
+  let goal = 60, topic = pick(KEEP), phase = 'idle', timer = null, manual = false, dead = false, busy = false;
+  let thr = 0.02, lastVoice = 0, startT = 0, result = null, analysis = null;
+  onLeave(() => { dead = true; timer && timer.stop(); rec.destroy(); });
+  const newTopic = () => { let n; do { n = pick(KEEP); } while (n === topic); topic = n; };
+  function paint(focus) {
+    let body = '';
+    if (phase === 'idle') body += `<div class="settings">${chipRow('Keep going for', 'goal', GOALS, goal, fmtTime)}</div>`;
+    body += `<div class="bubble"><p class="sub">Talk about:</p><p class="prompt">${esc(topic)}</p></div>`;
+    if (phase === 'idle') body += `<div class="row"><button type="button" class="btn ghost" data-act="topic">Another topic</button></div>
+      <div class="actions"><button type="button" class="btn" data-act="go">Start talking</button></div>
+      <p class="privacy">Your browser will ask for microphone access. The round is recorded so you get an analysis afterwards. The recording stays in your browser and is not uploaded by this site. Speech-to-text may be handled by your browser maker. If you say no to the mic, you can still play on the honor system.</p>`;
+    if (phase === 'cal') body += `<div class="timer">${ringHTML('0:02', 'Listening')}<p class="hint" role="status">${manual ? 'Mic not available. Playing on the honor system.' : 'Listening to the room. Stay quiet for a moment.'}</p></div>`;
+    if (phase === 'run') body += `<div class="timer">${ringHTML(fmt(goal), 'Talk')}<p class="hint" role="status">${manual ? 'Hit the button if you pause for more than two seconds.' : 'A pause of two seconds ends the round.'}</p>
+      ${manual ? '' : '<div class="micline"><span class="rec">● Voice</span><div class="meter"><i id="lvl"></i></div></div><div class="micline"><span class="rec">Silence</span><div class="meter sil"><i id="sil"></i></div></div>'}</div>
+      <div class="actions">${manual ? '<button type="button" class="btn" data-act="paused">I paused too long</button>' : ''}<button type="button" class="btn ghost" data-act="quit">Stop</button></div>`;
+    if (phase === 'wait') body += `<div class="timer">${ringHTML('0:00', 'Analyzing')}<p class="hint" role="status">Working out how that went…</p></div>`;
+    if (phase === 'over') {
+      const next = GOALS[Math.min(GOALS.indexOf(goal) + 1, GOALS.length - 1)];
+      body += result.ok
+        ? `<h3 class="donehead">You kept going for the full ${fmtTime(goal)}.</h3><p class="hint" style="text-align:left">${goal < 120 ? `Try ${fmtTime(next)} next.` : 'That is the longest setting. Try a harder topic.'}</p>`
+        : `<h3 class="donehead">Too quiet at ${fmt(result.secs)}.</h3><div class="tip"><p>You kept going for ${fmt(result.secs)} before the pause. The trick is to say something, anything, while you think: “what I mean is…”, “another thing is…”.</p></div>`;
+      if (analysis) body += reportHTML(analysis);
+      body += `<div class="actions">${result.ok ? `<button type="button" class="btn" data-act="up">${goal < 120 ? 'Go longer' : 'Go again'}</button><button type="button" class="btn ghost" data-act="again">Same length, new topic</button>` : `<button type="button" class="btn" data-act="retry">Try again</button><button type="button" class="btn ghost" data-act="again">New topic</button>`}</div>`;
+    }
+    app.innerHTML = shell(g, body, phase === 'cal' || phase === 'run' || phase === 'wait' ? 'running' : (phase === 'over' ? 'is-done' : ''));
+    if (focus) { const b = $('.actions .btn', app); b && b.focus(); }
+  }
+  async function start() {
+    if (busy) return;
+    busy = true; phase = 'cal'; analysis = null; manual = false; paint();
+    const ok = await rec.init();
+    if (dead) return;
+    manual = !ok; paint(); busy = false;
+    const cal = [];
+    timer = countdown(2, {
+      onTick: l => { tickRing(l, 2, false); if (!manual) cal.push(rec.level()); },
+      onEnd: () => { const avg = cal.length ? cal.reduce((a, b) => a + b, 0) / cal.length : 0.01; thr = Math.max(0.02, avg * 2.5 + 0.01); run(); }
+    });
+  }
+  function run() {
+    phase = 'run'; startT = performance.now(); lastVoice = startT; paint(true); beep(880);
+    timer = countdown(goal, { onTick: (l, t) => tickRing(l, t, false), onEnd: () => finish(true) });
+    if (!manual) rec.start(v => {
+      const now = performance.now();
+      if (v > thr) lastVoice = now;
+      const sil = now - lastVoice, a = $('#lvl', app), b = $('#sil', app);
+      if (a) a.style.width = Math.min(100, v / (thr * 4) * 100) + '%';
+      if (b) b.style.width = Math.min(100, sil / 2000 * 100) + '%';
+      if (sil >= 2000 && phase === 'run') finish(false, (lastVoice - startT) / 1000);
+    });
+  }
+  async function finish(ok, secs) {
+    if (phase !== 'run') return;
+    if (secs === undefined) secs = timer ? timer.elapsed() : 0;
+    timer && timer.stop(); timer = null; phase = 'wait';
+    result = { ok, secs: Math.max(0, Math.round(secs)) };
+    if (ok || result.secs >= 15) store.addRound();
+    beep(ok ? 660 : 330, 0.25);
+    if (!manual) {
+      paint();
+      try { analysis = buildAnalysis(await rec.stop()); } catch (e) { analysis = null; }
+      if (dead) return;
+    }
+    phase = 'over'; paint(true);
+  }
+  app.onclick = e => {
+    const t = e.target.closest('[data-set],[data-act]'); if (!t) return;
+    if (t.dataset.set === 'goal') { goal = +t.dataset.val; paint(); return; }
+    const a = t.dataset.act;
+    if (a === 'topic') { newTopic(); paint(); }
+    else if (a === 'go' || a === 'retry') start();
+    else if (a === 'again') { newTopic(); phase = 'idle'; paint(); }
+    else if (a === 'up') { goal = GOALS[Math.min(GOALS.indexOf(goal) + 1, GOALS.length - 1)]; newTopic(); phase = 'idle'; paint(); }
+    else if (a === 'paused') finish(false);
+    else if (a === 'quit') { timer && timer.stop(); timer = null; rec.stop(); phase = 'idle'; busy = false; paint(); }
+  };
+  paint();
+}
+
+/* ---------- Filler Killer ---------- */
+function analyze(text) {
+  const counts = {}; let out = '', last = 0, total = 0;
+  for (const m of text.matchAll(FILLER_RE)) {
+    out += esc(text.slice(last, m.index)) + '<mark>' + esc(m[0]) + '</mark>';
+    last = m.index + m[0].length;
+    const k = m[0].toLowerCase(); counts[k] = (counts[k] || 0) + 1; total++;
+  }
+  out += esc(text.slice(last));
+  return { counts, total, html: out };
+}
+function mountFiller(g) {
+  const rec = makeRecorder();
+  const canVoice = rec.hasSR && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  const allPrompts = Object.values(IMPROMPTU).flat();
+  let time = 60, topic = pick(allPrompts), phase = 'idle', timer = null, dead = false, err = '', analysis = null, prevTotal = null, typed = '', liveT = null;
+  onLeave(() => { dead = true; timer && timer.stop(); clearInterval(liveT); rec.destroy(); });
+  const newTopic = () => { let n; do { n = pick(allPrompts); } while (n === topic); topic = n; };
+  function paint(focus) {
+    let body = '';
+    const bubble = `<div class="bubble"><p class="sub">Talk about:</p><p class="prompt">${esc(topic)}</p></div>`;
+    if (phase === 'idle') {
+      body = `<div class="settings">${chipRow('Speaking time', 'time', [30, 60, 90], time, fmtTime)}</div>${bubble}
+        <div class="row"><button type="button" class="btn ghost" data-act="topic">Another topic</button></div>
+        ${err ? `<div class="note-box"><p>${esc(err)}</p></div>` : ''}
+        <div class="actions">${canVoice ? '<button type="button" class="btn" data-act="voice">Start speaking</button>' : ''}<button type="button" class="btn ${canVoice ? 'ghost' : ''}" data-act="type">${canVoice ? 'Type or paste instead' : 'Type or paste what you said'}</button></div>
+        <p class="privacy">${canVoice ? 'Speaking uses your microphone and your browser\u2019s speech recognition, which may be handled by the browser maker. ' : 'Your browser does not support speech recognition, so paste or type what you said. Voice typing on a phone keyboard works well. '}This site does not save or upload anything you say.</p>`;
+    } else if (phase === 'listen') {
+      body = `${bubble}<div class="timer">${ringHTML(fmt(time), 'Speak')}<div class="micline"><span class="rec">● Recording</span><div class="meter"><i id="lvl"></i></div></div></div>
+        <div class="transcript live" id="live">Listening…</div><div class="actions"><button type="button" class="btn" data-act="stop">I'm done</button></div>`;
+    } else if (phase === 'type') {
+      body = `${bubble}${err ? `<div class="note-box"><p>${esc(err)}</p></div>` : ''}
+        <p class="sub" style="margin-top:1rem">What did you say?</p>
+        <textarea class="field" id="txt" placeholder="Paste or type your answer here, exactly as you said it, ums included.">${esc(typed)}</textarea>
+        <div class="actions"><button type="button" class="btn" data-act="analyze">Count my fillers</button><button type="button" class="btn ghost" data-act="cancel">Back</button></div>`;
+    } else if (phase === 'wait') {
+      body = `${bubble}<div class="timer">${ringHTML('0:00', 'Analyzing')}<p class="hint" role="status">Working out how that went…</p></div>`;
+    } else if (phase === 'result') {
+      const t = analysis.fillers.total;
+      const delta = prevTotal === null ? '' : t < prevTotal ? `Last time you had ${prevTotal}. Now ${t}. That is progress.` : t === prevTotal ? `Same as last time (${prevTotal}). Try slowing down.` : `Last time you had ${prevTotal}. Now ${t}. Slow down and pause silently instead.`;
+      body = `${bubble}${delta ? `<div class="tip"><p>${delta}</p></div>` : ''}${reportHTML(analysis)}
+        <div class="actions"><button type="button" class="btn" data-act="again">Say it again, cleaner</button><button type="button" class="btn ghost" data-act="new">New topic</button></div>`;
+    }
+    app.innerHTML = shell(g, body, phase === 'listen' || phase === 'wait' ? 'running' : '');
+    if (focus) { const b = $('.actions .btn', app); b && b.focus(); }
+  }
+  async function startVoice() {
+    err = '';
+    const ok = await rec.init();
+    if (dead) return;
+    if (!ok) { err = 'Microphone access was blocked. Type or paste your answer instead.'; phase = 'type'; paint(); return; }
+    phase = 'listen'; paint(true);
+    rec.start(v => { const m = $('#lvl', app); if (m) m.style.width = Math.min(100, v * 400) + '%'; });
+    liveT = setInterval(() => { const el = $('#live', app); if (el) el.textContent = rec.live() || 'Listening…'; }, 300);
+    timer = countdown(time, { onTick: (l, t) => tickRing(l, t, l <= 10 && t > 20), onEnd: () => stopVoice() });
+  }
+  async function stopVoice() {
+    if (phase !== 'listen') return;
+    timer && timer.stop(); timer = null; clearInterval(liveT);
+    phase = 'wait'; paint();
+    const rr = await rec.stop();
+    if (dead) return;
+    if (!rr.transcript) {
+      err = rr.srError ? `Speech recognition stopped (${rr.srError}). Type or paste your answer instead.` : 'Nothing came through. Check your microphone, or type your answer instead.';
+      phase = rr.srError ? 'type' : 'idle'; paint(); return;
+    }
+    analysis = buildAnalysis(rr); phase = 'result'; store.addRound(); paint(true);
+  }
+  app.onclick = e => {
+    const t = e.target.closest('[data-set],[data-act]'); if (!t) return;
+    if (t.dataset.set === 'time') { time = +t.dataset.val; paint(); return; }
+    const a = t.dataset.act;
+    if (a === 'topic') { newTopic(); paint(); }
+    else if (a === 'voice') startVoice();
+    else if (a === 'stop') stopVoice();
+    else if (a === 'type') { err = ''; typed = ''; phase = 'type'; paint(true); }
+    else if (a === 'cancel') { phase = 'idle'; err = ''; paint(); }
+    else if (a === 'analyze') { const v = ($('#txt', app).value || '').trim(); typed = v; if (!v) { err = 'Add some text first.'; paint(); return; } err = ''; analysis = buildAnalysis({ transcript: v, frames: [], duration: 0, audioUrl: '', hasSR: true }); phase = 'result'; store.addRound(); paint(true); }
+    else if (a === 'again') { prevTotal = analysis ? analysis.fillers.total : null; err = ''; phase = 'idle'; paint(); }
+    else if (a === 'new') { prevTotal = null; newTopic(); phase = 'idle'; paint(); }
+  };
+  paint();
+}
+
+/* ---------- boot ---------- */
+store.load();
+$('#snd').addEventListener('click', () => { store.data.sound = !store.data.sound; store.save(); renderStats(); });
+window.addEventListener('hashchange', route);
+renderStats();
+route();
+})();
+</script>
+</body>
+</html>
